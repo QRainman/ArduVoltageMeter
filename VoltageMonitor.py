@@ -32,8 +32,9 @@ class VoltageDataLogger:
     print(lineString)
   
     try:
-      response = session.post('http://192.168.178.220:8090/telegraf', lineString)
-      print(response)
+      #response = session.post('http://192.168.178.220:8090/telegraf', lineString)
+      #print(response)
+      pass
     except:
       print('Failed to submit data string %s' % lineString)
       print(traceback.format_exc())
@@ -50,7 +51,7 @@ class VoltageDataLogger:
     self.prevTime = time
 
 def mainLoop():
-  ser = serial.Serial('COM4', 9600)
+  ser = serial.Serial('/dev/ttyACM0', 9600)
 
   vl = VoltageDataLogger(1)
 
@@ -59,7 +60,7 @@ def mainLoop():
     now = datetime.datetime.now()
     x = x.decode().strip()
     vals = json.loads(x)
-    data = vl.convertData(vals)
+    data = vl.convertData(vals["volts"])
     vl.integrate(data, now)
     vl.sendData('101876', data, now)
 
