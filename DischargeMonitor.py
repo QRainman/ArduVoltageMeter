@@ -6,12 +6,12 @@ import time
 
 from BatteryMonitor import BatteryMonitor
 from serial import Serial
+from optparse import OptionParser
 
 
 class ChargeMonitor(BatteryMonitor):
-  def __init__(self):
-    super().__init__(batteryLowCutOff=3.0, batteryHighCutOff=4.3, shuntResistance=9.77, voltMeterChannels=[0, 1, 2, 3],
-                     calibrationFile='calibration-all.json', port=Serial('/dev/ttyACM0', 9600))
+  def __init__(self, options, shuntResistance=9.77):
+    super().__init__(options, shuntResistance=shuntResistance, voltMeterChannels=[0, 1, 2, 3])
 
   def startDischarge(self):
     self.vm.enableRelay()
@@ -21,10 +21,10 @@ class ChargeMonitor(BatteryMonitor):
 
 
 class DischargeTest:
-  def __init__(self, batteryID, initialCharge):
-    self.chargeMon = ChargeMonitor()
-    self.chargeMon.integradetCurrent = initialCharge
-    self.batteryID = batteryID
+  def __init__(self):
+    options, _ = DischargeTest.getOptions()
+    self.chargeMon = ChargeMonitor(options, shuntResistance=options.shunt)
+    self.batteryID = options.battery_id
     self.run = False
     pass
 
@@ -69,7 +69,14 @@ class DischargeTest:
     self.chargeMon.stopDischarge()
     self.chargeMon.vm.stop()
 
+  @staticmethod
+  def getOptions():
+    opt = OptionParser()
+    ChargeMonitor.getOptions(opt)
+    opt.add_option('-s', '--shunt', dest='shunt', help='Shunt resistance in Ohm', type='float', default=9.77)
+    return opt.parse_args()
+
 
 if __name__ == '__main__':
-  dm = DischargeTest('I1804R49746', 0)
+  dm = DischargeTest()
   dm.start()
