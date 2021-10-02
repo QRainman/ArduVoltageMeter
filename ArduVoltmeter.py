@@ -119,7 +119,7 @@ class ArduVoltmeter:
 
 if __name__ == '__main__':
   log.info('Starting')
-  vMeter = ArduVoltmeter(channelList=[0, 1, 2, 3], calibrationFile='calibration.json', port=serial.Serial('COM4', 9600))
+  vMeter = ArduVoltmeter(channelList=[0, 1, 2, 3, 4, 5], calibrationFile='calibration-all.json', port=serial.Serial('COM4', 9600))
   vMeter.start()
   vMeter.waitReady()
   log.info('Meter Ready')
