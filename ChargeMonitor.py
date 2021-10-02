@@ -45,14 +45,14 @@ def sendData(battery, chargeSession, voltage, current, integratedCurrent, intPow
 
 def getOptions():
   opt = OptionParser()
-  opt.add_option('-b', '--battery_id', target='battery_id', help='Battery Serial Number', type='string', default='Unknown')
-  opt.add_option('-m', '--i_min', target='i_min', help='Current at which charging stops in mA', type='float', default=50.0)
-  opt.add_option('-U', '--u_max', target='u_max', help='Max Voltage safety cutoff in V', type='float', default=4.3)
-  opt.add_option('-L', '--u_min', target='u_min', help='Minimum Voltage cutoff in V', type='float', default=0.0)
-  opt.add_option('-i', '--i_start', target='i_start', help='Integrated Current start value in Ah', type='float', default=0.0)
-  opt.add_option('-p', '--port', target='port', help='Serial port name', type='string', default='/dev/ttyACM0')
-  opt.add_option('-r', '--baud', target='baud_rate', help='Serial port baud rate', type='int', default=9600)
-  opt.add_option('-c', '--calib', target='calib_file', help='Path to calibration file', type='string', default='calibration-all.json')
+  opt.add_option('-b', '--battery_id', dest='battery_id', help='Battery Serial Number', type='string', default='Unknown')
+  opt.add_option('-m', '--i_min', dest='i_min', help='Current at which charging stops in mA', type='float', default=50.0)
+  opt.add_option('-U', '--u_max', dest='u_max', help='Max Voltage safety cutoff in V', type='float', default=4.3)
+  opt.add_option('-L', '--u_min', dest='u_min', help='Minimum Voltage cutoff in V', type='float', default=0.0)
+  opt.add_option('-i', '--i_start', dest='i_start', help='Integrated Current start value in Ah', type='float', default=0.0)
+  opt.add_option('-p', '--port', dest='port', help='Serial port name', type='string', default='/dev/ttyACM0')
+  opt.add_option('-r', '--baud', dest='baud_rate', help='Serial port baud rate', type='int', default=9600)
+  opt.add_option('-c', '--calib', dest='calib_file', help='Path to calibration file', type='string', default='calibration-all.json')
   return opt.parse_args()
 
 
