@@ -58,7 +58,7 @@ def getOptions():
 
 def main():
   options, args = getOptions()
-  chargeMon = ChargeMonitor(options.u_min, options.u_max, options.calib_file, Serial('options.port', options.baud_rate))
+  chargeMon = ChargeMonitor(options.u_min, options.u_max, options.calib_file, Serial(options.port, options.baud_rate))
   chargeMon.start(batteryHighCutOff=options.u_max)
   #chargeMon.start(integratedCurrentLimit=0.8)
   chargeMon.integradetCurrent = 0
@@ -68,7 +68,7 @@ def main():
     print(chargeMon.rawValues)
     t, chargeSession, U_bat, I_bat, int_current, int_power = chargeMon.getCurrentState()
     sendData(options.battery_id, chargeSession, U_bat, I_bat, int_current, int_power, t)
-    if I_bat < (options.i_min * 1000):
+    if I_bat < (options.i_min / 1000) and I_bat > 0.005:
       chargeMon.stopCharge()
       print('Charging complete, capacity: %f' % int_current)
     time.sleep(5)
