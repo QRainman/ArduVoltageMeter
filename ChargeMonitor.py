@@ -9,9 +9,8 @@ from optparse import OptionParser
 
 
 class ChargeMonitor(BatteryMonitor):
-  def __init__(self, batteryLowCutoff, batteryHighCutOff, calibrationFile, port):
-    super().__init__(batteryLowCutOff=batteryLowCutoff, batteryHighCutOff=batteryHighCutOff, shuntResistance=1.433,
-                     voltMeterChannels=[0, 1, 4, 5], calibrationFile=calibrationFile, port=port)
+  def __init__(self, options, shuntResistance=1.433):
+    super().__init__(options, shuntResistance=shuntResistance, voltMeterChannels=[0, 1, 4, 5])
 
   def startCharge(self):
     self.vm.enableRelay()
@@ -45,20 +44,15 @@ def sendData(battery, chargeSession, voltage, current, integratedCurrent, intPow
 
 def getOptions():
   opt = OptionParser()
-  opt.add_option('-b', '--battery_id', dest='battery_id', help='Battery Serial Number', type='string', default='Unknown')
+  ChargeMonitor.getOptions(opt)
   opt.add_option('-m', '--i_min', dest='i_min', help='Current at which charging stops in mA', type='float', default=50.0)
-  opt.add_option('-U', '--u_max', dest='u_max', help='Max Voltage safety cutoff in V', type='float', default=4.3)
-  opt.add_option('-L', '--u_min', dest='u_min', help='Minimum Voltage cutoff in V', type='float', default=0.0)
-  opt.add_option('-i', '--i_start', dest='i_start', help='Integrated Current start value in Ah', type='float', default=0.0)
-  opt.add_option('-p', '--port', dest='port', help='Serial port name', type='string', default='/dev/ttyACM0')
-  opt.add_option('-r', '--baud', dest='baud_rate', help='Serial port baud rate', type='int', default=9600)
-  opt.add_option('-c', '--calib', dest='calib_file', help='Path to calibration file', type='string', default='calibration-all.json')
+  opt.add_option('-s', '--shunt', dest='shunt', help='Shunt resistance in Ohm', type='float', default=1.433)
   return opt.parse_args()
 
 
 def main():
   options, args = getOptions()
-  chargeMon = ChargeMonitor(options.u_min, options.u_max, options.calib_file, Serial(options.port, options.baud_rate))
+  chargeMon = ChargeMonitor(options, options.shunt)
   chargeMon.start(batteryHighCutOff=options.u_max)
   #chargeMon.start(integratedCurrentLimit=0.8)
   chargeMon.integradetCurrent = 0
@@ -68,7 +62,7 @@ def main():
     print(chargeMon.rawValues)
     t, chargeSession, U_bat, I_bat, int_current, int_power = chargeMon.getCurrentState()
     sendData(options.battery_id, chargeSession, U_bat, I_bat, int_current, int_power, t)
-    if I_bat < (options.i_min / 1000) and I_bat > 0.005:
+    if (options.i_min / 1000) > I_bat > 0.005:
       chargeMon.stopCharge()
       print('Charging complete, capacity: %f' % int_current)
     time.sleep(5)

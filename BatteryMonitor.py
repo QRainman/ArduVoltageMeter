@@ -4,22 +4,21 @@ import datetime
 
 
 class BatteryMonitor:
-  def __init__(self, batteryLowCutOff=3.0, batteryHighCutOff=4.25, shuntResistance=9.77, voltMeterChannels=[0, 1, 2, 3],
-               calibrationFile='calibration-all.json', port=Serial('/dev/ttyACM0', 9600)):
-    self.batteryLowCutOff = batteryLowCutOff
-    self.batteryHighCutOff = batteryHighCutOff
+  def __init__(self, options, shuntResistance=9.77, voltMeterChannels=[0, 1, 2, 3]):
+    self.batteryLowCutOff = options.u_min
+    self.batteryHighCutOff = options.u_max
     self.integratedCurrentLimit = 0
     self.integratedPower = 0
 
     self.shuntResistance = shuntResistance
-    self.integradetCurrent = 0.0
+    self.integradetCurrent = options.i_start
     self.batVoltage = 0.0
     self.bat_channel_1 = 0
     self.bat_channel_2 = 1
     self.current_channel_1 = 2
     self.current_channel_2 = 3
 
-    self.vm = ArduVoltmeter(voltMeterChannels, calibrationFile, port)
+    self.vm = ArduVoltmeter(voltMeterChannels, options.calib_file, Serial(options.port, options.baud_rate))
     self.vm.start()
     self.vm.waitReady()
 
@@ -76,3 +75,16 @@ class BatteryMonitor:
 
   def getRelayState(self):
     return self.vm.relay
+
+  @staticmethod
+  def getOptions(opt):
+    opt.add_option('-b', '--battery_id', dest='battery_id', help='Battery Serial Number', type='string', default='Unknown')
+    opt.add_option('-U', '--u_max', dest='u_max', help='Max Voltage safety cutoff in V', type='float', default=4.3)
+    opt.add_option('-L', '--u_min', dest='u_min', help='Minimum Voltage cutoff in V', type='float', default=0.0)
+    opt.add_option('-i', '--i_start', dest='i_start', help='Integrated Current start value in Ah', type='float', default=0.0)
+    opt.add_option('-p', '--port', dest='port', help='Serial port name', type='string', default='/dev/ttyACM0')
+    opt.add_option('-r', '--baud', dest='baud_rate', help='Serial port baud rate', type='int', default=9600)
+    opt.add_option('-c', '--calib', dest='calib_file', help='Path to calibration file', type='string', default='calibration-all.json')
+    return opt
+
+
