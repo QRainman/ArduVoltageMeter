@@ -5,7 +5,7 @@ import datetime
 
 class BatteryMonitor:
   def __init__(self, batteryLowCutOff=3.0, batteryHighCutOff=4.25, shuntResistance=9.77, voltMeterChannels=[0, 1, 2, 3],
-               calibrationFile='calibration.json', port=Serial('COM100', 9600)):
+               calibrationFile='calibration-all.json', port=Serial('/dev/ttyACM0', 9600)):
     self.batteryLowCutOff = batteryLowCutOff
     self.batteryHighCutOff = batteryHighCutOff
     self.integratedCurrentLimit = 0

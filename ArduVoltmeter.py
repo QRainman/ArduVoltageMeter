@@ -38,7 +38,7 @@ class ArduVoltmeter:
       calibFunctions = []
       cnts = calibData['counts']
       volts = calibData['volts']
-      for i in range(len(self.channelList)):
+      for i in range(6):
         chanCnts = [x[i] for x in cnts]
         print(chanCnts)
         calibFunctions.append(interpolate.interp1d(chanCnts, volts))
@@ -57,7 +57,7 @@ class ArduVoltmeter:
     self.runThread.join()
 
   def convertData(self, values):
-    res =  [(self.calibrationFunction[i]([values[i]]))[0] for i in range(len(self.channelList))]
+    res =  [(self.calibrationFunction[i]([values[i]]))[0] for i in range(6)]
     return res
 
   def dumbConvert(self, values):
@@ -85,6 +85,7 @@ class ArduVoltmeter:
       with self.updateLock:
         self.values = now, self.convertData(vals['volts'])
         self.relay = vals['relay']
+        print('updating self.value: ', self.values)
     except:
       log.error('Problem when decoding serial data')
       log.error(traceback.format_exc())
@@ -104,12 +105,14 @@ class ArduVoltmeter:
     with self.updateLock:
       for channel in self.channelList:
         res.append(self.values[1][channel])
+    return self.values[0], res
 
   def readValuesWait(self):
     res = []
     self.readyLock.acquire()
     self.readyLock.wait()
     with self.updateLock:
+      print(self.values)
       for channel in self.channelList:
         res.append(self.values[1][channel])
     self.readyLock.release()

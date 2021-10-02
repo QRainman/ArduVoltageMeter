@@ -10,7 +10,7 @@ from BatteryMonitor import BatteryMonitor
 class ChargeMonitor(BatteryMonitor):
   def __init__(self):
     super().__init__(batteryLowCutOff=2.95, batteryHighCutOff=4.25, shuntResistance=1.433, voltMeterChannels=[0, 1, 4, 5],
-                     calibrationFile='calibration.json', port=Serial('/dev/ttyACM0', 9600))
+                     calibrationFile='calibration-all.json', port=Serial('/dev/ttyACM0', 9600))
 
   def startCharge(self):
     self.vm.enableRelay()
