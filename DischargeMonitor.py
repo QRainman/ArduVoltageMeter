@@ -8,8 +8,8 @@ from serial import Serial
 
 class ChargeMonitor(BatteryMonitor):
   def __init__(self):
-    super().__init__(batteryLowCutOff=3.0, batteryHighCutOff=4.25, shuntResistance=9.77, voltMeterChannels=[0, 1, 2, 3],
-                     calibrationFile='calibration.json', port=Serial('COM4', 9600))
+    super().__init__(batteryLowCutOff=3.0, batteryHighCutOff=4.3, shuntResistance=9.77, voltMeterChannels=[0, 1, 2, 3],
+                     calibrationFile='calibration-all.json', port=Serial('/dev/ttyACM0', 9600))
 
   def startDischarge(self):
     self.vm.enableRelay()
@@ -47,7 +47,7 @@ class DischargeTest:
     try:
       response = session.post('http://192.168.178.220:8090/telegraf', lineString)
       print(response)
-      #pass
+      # pass
     except:
       print('Failed to submit data string %s' % lineString)
       print(traceback.format_exc())
