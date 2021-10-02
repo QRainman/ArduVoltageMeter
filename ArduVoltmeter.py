@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import json
 import logging
 import datetime
@@ -5,6 +7,7 @@ import threading
 import copy
 import serial
 import time
+import traceback
 from scipy import interpolate
 
 log = logging.getLogger(__name__)
@@ -32,9 +35,14 @@ class ArduVoltmeter:
   def readCalibrationFile(self):
     with open(self.calibrationFile) as inputFile:
       calibData = json.load(inputFile)
+      calibFunctions = []
       cnts = calibData['counts']
       volts = calibData['volts']
-      return interpolate.interp1d(cnts, volts)
+      for i in range(len(self.channelList)):
+        chanCnts = [x[i] for x in cnts]
+        print(chanCnts)
+        calibFunctions.append(interpolate.interp1d(chanCnts, volts))
+      return calibFunctions
 
     log.error('Could not load calibration file: %s' % self.calibrationFile)
 
@@ -49,7 +57,8 @@ class ArduVoltmeter:
     self.runThread.join()
 
   def convertData(self, values):
-    return self.calibrationFunction(values)
+    res =  [(self.calibrationFunction[i]([values[i]]))[0] for i in range(len(self.channelList))]
+    return res
 
   def dumbConvert(self, values):
     #return [float(x) / 1024.0 * 5.0 for x in values]
@@ -78,6 +87,7 @@ class ArduVoltmeter:
         self.relay = vals['relay']
     except:
       log.error('Problem when decoding serial data')
+      log.error(traceback.format_exc())
 
   def waitReady(self):
     while not self.ready:
@@ -119,7 +129,7 @@ class ArduVoltmeter:
 
 if __name__ == '__main__':
   log.info('Starting')
-  vMeter = ArduVoltmeter(channelList=[0, 1, 2, 3, 4, 5], calibrationFile='calibration-all.json', port=serial.Serial('COM4', 9600))
+  vMeter = ArduVoltmeter(channelList=[0, 1, 2, 3, 4, 5], calibrationFile='calibration-all.json', port=serial.Serial('/dev/ttyACM0', 9600))
   vMeter.start()
   vMeter.waitReady()
   log.info('Meter Ready')
