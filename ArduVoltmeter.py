@@ -40,7 +40,7 @@ class ArduVoltmeter:
       volts = calibData['volts']
       for i in range(6):
         chanCnts = [x[i] for x in cnts]
-        print(chanCnts)
+        #print(chanCnts)
         calibFunctions.append(interpolate.interp1d(chanCnts, volts))
       return calibFunctions
 
@@ -85,7 +85,7 @@ class ArduVoltmeter:
       with self.updateLock:
         self.values = now, self.convertData(vals['volts'])
         self.relay = vals['relay']
-        print('updating self.value: ', self.values)
+        #print('updating self.value: ', self.values)
     except:
       log.error('Problem when decoding serial data')
       log.error(traceback.format_exc())
@@ -112,7 +112,7 @@ class ArduVoltmeter:
     self.readyLock.acquire()
     self.readyLock.wait()
     with self.updateLock:
-      print(self.values)
+      #print(self.values)
       for channel in self.channelList:
         res.append(self.values[1][channel])
     self.readyLock.release()

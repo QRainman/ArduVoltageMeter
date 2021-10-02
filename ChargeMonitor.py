@@ -44,9 +44,9 @@ def sendData(battery, chargeSession, voltage, current, integratedCurrent, intPow
 
 def main():
   chargeMon = ChargeMonitor()
-  chargeMon.start(batteryHighCutOff=4.3)
+  chargeMon.start(batteryHighCutOff=4.35)
   #chargeMon.start(integratedCurrentLimit=0.8)
-  chargeMon.integradetCurrent = 0.507
+  chargeMon.integradetCurrent = 0
   run = True
   while run:
     chargeMon.readValues()

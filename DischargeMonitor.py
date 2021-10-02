@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import requests
 import traceback
 import time
@@ -69,5 +71,5 @@ class DischargeTest:
 
 
 if __name__ == '__main__':
-  dm = DischargeTest('101874', 1.446964)
+  dm = DischargeTest('I1804R49746', 0)
   dm.start()
