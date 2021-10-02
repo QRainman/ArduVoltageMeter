@@ -55,7 +55,7 @@ def main():
   chargeMon = ChargeMonitor(options, options.shunt)
   chargeMon.start(batteryHighCutOff=options.u_max)
   #chargeMon.start(integratedCurrentLimit=0.8)
-  chargeMon.integradetCurrent = 0
+  #chargeMon.integradetCurrent = 0
   run = True
   while run:
     chargeMon.readValues()
