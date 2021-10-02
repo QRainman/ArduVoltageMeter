@@ -1,10 +1,12 @@
+#!/usr/bin/python3
+
 from ArduVoltmeter import ArduVoltmeter
 import serial
 import json
 from optparse import OptionParser
 
 opt = OptionParser()
-opt.add_option('-p', '--port', dest='port', help='Serial port name', default='/dev/ttyAMC0')
+opt.add_option('-p', '--port', dest='port', help='Serial port name', default='/dev/ttyACM0')
 opt.add_option('-b', '--baud', dest='baud', help='Serial port baud rate', default=9600, type='int')
 options, args = opt.parse_args()
 
@@ -29,7 +31,7 @@ while cont:
   counts.append(cnt)
 
 for c, v in zip(counts, volts):
-  print('%d: %f' % (c, v))
+  print('%s: %f' % (c, v))
 
 d = {'volts': volts, 'counts': counts}
 
