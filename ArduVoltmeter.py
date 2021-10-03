@@ -21,7 +21,7 @@ class ArduVoltmeter:
     if self.calibrationFile is not None:
       self.calibrationFunction = self.readCalibrationFile()
     else:
-      self.calibrationFunction = self.dumbConvert
+      self.calibrationFunction = self.setupCountConvert()
 
     self.port = port
     self.values = None
@@ -45,6 +45,9 @@ class ArduVoltmeter:
       return calibFunctions
 
     log.error('Could not load calibration file: %s' % self.calibrationFile)
+
+  def setupCountConvert(self):
+    return [self.dumbConvert for i in range(6)] 
 
   def start(self):
     self.run = True
@@ -82,6 +85,7 @@ class ArduVoltmeter:
     x = x.decode().strip()
     try:
       vals = json.loads(x)
+      #print(vals['volts'])
       with self.updateLock:
         self.values = now, self.convertData(vals['volts'])
         self.relay = vals['relay']
