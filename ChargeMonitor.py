@@ -9,8 +9,8 @@ from optparse import OptionParser
 
 
 class ChargeMonitor(BatteryMonitor):
-  def __init__(self, options, shuntResistance=1.433):
-    super().__init__(options, shuntResistance=shuntResistance, voltMeterChannels=[0, 1, 4, 5])
+  def __init__(self, options, shuntResistance=1.408):
+    super().__init__(options, shuntResistance=shuntResistance, voltMeterChannels=[0, 1, 5, 4])
 
   def startCharge(self):
     self.vm.enableRelay()
@@ -46,7 +46,7 @@ def getOptions():
   opt = OptionParser()
   ChargeMonitor.getOptions(opt)
   opt.add_option('-m', '--i_min', dest='i_min', help='Current at which charging stops in mA', type='float', default=50.0)
-  opt.add_option('-s', '--shunt', dest='shunt', help='Shunt resistance in Ohm', type='float', default=1.433)
+  opt.add_option('-s', '--shunt', dest='shunt', help='Shunt resistance in Ohm', type='float', default=1.408)
   return opt.parse_args()
 
 
@@ -57,14 +57,19 @@ def main():
   #chargeMon.start(integratedCurrentLimit=0.8)
   #chargeMon.integradetCurrent = 0
   run = True
+  doneCount = 0
   while run:
     chargeMon.readValues()
     print(chargeMon.rawValues)
     t, chargeSession, U_bat, I_bat, int_current, int_power = chargeMon.getCurrentState()
     sendData(options.battery_id, chargeSession, U_bat, I_bat, int_current, int_power, t)
-    if (options.i_min / 1000) > I_bat > 0.005:
-      chargeMon.stopCharge()
-      print('Charging complete, capacity: %f' % int_current)
+    if (options.i_min / 1000) > I_bat:
+      doneCount +=1
+      if doneCount >= 5:
+        chargeMon.stopCharge()
+        print('Charging complete, capacity: %f' % int_current)
+    else:
+      doneCount = 0
     time.sleep(5)
 
 
