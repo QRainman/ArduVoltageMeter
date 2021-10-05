@@ -7,6 +7,7 @@ import time
 from BatteryMonitor import BatteryMonitor
 from serial import Serial
 from optparse import OptionParser
+from threading import Thread
 
 
 class ChargeMonitor(BatteryMonitor):
@@ -26,7 +27,7 @@ class DischargeTest:
     self.chargeMon = ChargeMonitor(options, shuntResistance=options.shunt)
     self.batteryID = options.battery_id
     self.run = False
-    pass
+    self.runThread = None
 
   def interruptHandler(self):
     pass
@@ -55,6 +56,17 @@ class DischargeTest:
       print(traceback.format_exc())
 
   def start(self):
+    if self.runThread is not None:
+      print('Run thread already exists. Aborting start')
+      return
+
+    print('Creating monitoring thread')
+    self.runThread = Thread(target=self.run_a)
+    self.runThread.start()
+    print('Monitoring thread started')
+
+  def run_a(self):
+    print('Starting chargemon')
     self.chargeMon.start()
     self.run = True
     while self.run:
@@ -63,11 +75,16 @@ class DischargeTest:
       print(self.chargeMon.getRelayState())
       t, chargeSession, U_bat, I_bat, int_current, int_power = self.chargeMon.getCurrentState()
       self.sendData(chargeSession, U_bat, I_bat, int_current, int_power, t)
-      if self.chargeMon.vm.relay == 0:
-        print('Discharge finished. Capacity: %f mAh' % self.chargeMon.integradetCurrent * 1000)
+      #if self.chargeMon.vm.relay == 0:
+      #  print('Discharge finished. Capacity: %f mAh' % self.chargeMon.integradetCurrent * 1000)
       time.sleep(5)
     self.chargeMon.stopDischarge()
     self.chargeMon.vm.stop()
+
+  def stop(self):
+    self.run = False
+    self.runThread.join()
+    self.runThread = None
 
   @staticmethod
   def getOptions():
@@ -80,3 +97,17 @@ class DischargeTest:
 if __name__ == '__main__':
   dm = DischargeTest()
   dm.start()
+
+  while True:
+    res = input('press s to start discharge, x to stop discharge, e to end: ')
+    if res == 's':
+      dm.chargeMon.startDischarge()
+    elif res == 'x':
+      dm.chargeMon.stopDischarge()
+    elif res == 'e':
+      dm.stop()
+      break
+    else:
+      print('Unknown command')
+
+

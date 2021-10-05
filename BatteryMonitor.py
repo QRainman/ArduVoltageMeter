@@ -36,7 +36,6 @@ class BatteryMonitor:
     self.batteryLowCutOff = batteryLowCutOff
     self.batteryHighCutOff = batteryHighCutOff
     self.integratedCurrentLimit = integratedCurrentLimit
-    self.vm.enableRelay()
 
   def getCurrent(self):
     vDiff = self.rawValues[self.current_channel_2] - self.rawValues[self.current_channel_1]
@@ -75,6 +74,9 @@ class BatteryMonitor:
 
   def getRelayState(self):
     return self.vm.relay
+
+  def stop(self):
+    return self.vm.stop()
 
   @staticmethod
   def getOptions(opt):
