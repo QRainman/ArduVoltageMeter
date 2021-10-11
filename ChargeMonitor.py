@@ -25,7 +25,7 @@ class ChargeTest:
     options, _ = ChargeTest.getOptions()
     self.chargeMon = ChargeMonitor(options, shuntResistance=options.shunt)
     self.batteryID = options.battery_id
-    self.run = False
+    self.run = True
     self.runThread = None
 
   def sendData(self, chargeSession, voltage, current, integratedCurrent, intPower, t):
@@ -69,7 +69,8 @@ class ChargeTest:
     print('Monitoring thread started')
 
   def run_a(self):
-    self.chargeMon.start(batteryHighCutOff=self.options.u_max)
+    print('Starting discharge monitor')
+    self.chargeMon.start()
     doneCount = 0
     while self.run:
       self.chargeMon.readValues()
