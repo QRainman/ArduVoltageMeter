@@ -81,7 +81,7 @@ class BatteryMonitor:
   @staticmethod
   def getOptions(opt):
     opt.add_option('-b', '--battery_id', dest='battery_id', help='Battery Serial Number', type='string', default='Unknown')
-    opt.add_option('-U', '--u_max', dest='u_max', help='Max Voltage safety cutoff in V', type='float', default=4.3)
+    opt.add_option('-U', '--u_max', dest='u_max', help='Max Voltage safety cutoff in V', type='float', default=4.25)
     opt.add_option('-L', '--u_min', dest='u_min', help='Minimum Voltage cutoff in V', type='float', default=0.0)
     opt.add_option('-i', '--i_start', dest='i_start', help='Integrated Current start value in Ah', type='float', default=0.0)
     opt.add_option('-p', '--port', dest='port', help='Serial port name', type='string', default='/dev/ttyACM0')
