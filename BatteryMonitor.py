@@ -11,7 +11,7 @@ class BatteryMonitor:
     self.integratedPower = 0
 
     self.shuntResistance = shuntResistance
-    self.integradetCurrent = options.i_start
+    self.integratedCurrent = options.i_start
     self.batVoltage = 0.0
     self.bat_channel_1 = 0
     self.bat_channel_2 = 1
@@ -29,12 +29,10 @@ class BatteryMonitor:
   def checkLimits(self):
     _tmp, v_bat = self.getBatVoltage()
     if v_bat <= self.batteryLowCutOff or v_bat >= self.batteryHighCutOff or \
-        (0.0 < self.integratedCurrentLimit < self.integradetCurrent):
+        (0.0 < self.integratedCurrentLimit < self.integratedCurrent):
       self.vm.disableRelay()
 
-  def start(self, batteryLowCutOff=3.0, batteryHighCutOff=4.2, integratedCurrentLimit=0.0):
-    self.batteryLowCutOff = batteryLowCutOff
-    self.batteryHighCutOff = batteryHighCutOff
+  def start(self, integratedCurrentLimit=0.0):
     self.integratedCurrentLimit = integratedCurrentLimit
 
   def getCurrent(self):
@@ -52,7 +50,7 @@ class BatteryMonitor:
     _tmp, voltage = self.getBatVoltage()
     timeDiff = (t-self.prevTime).total_seconds()
 
-    self.integradetCurrent += (current * float(timeDiff) / 3600.0)
+    self.integratedCurrent += (current * float(timeDiff) / 3600.0)
     self.integratedPower += current * voltage * float(timeDiff) / 3600.0
 
   def readValues(self):
@@ -67,10 +65,10 @@ class BatteryMonitor:
     return self.prevTime, self.rawValues[self.bat_channel_2] - self.rawValues[self.bat_channel_1]
 
   def getIntegratedCurrent(self):
-    return self.prevTime, self.integradetCurrent
+    return self.prevTime, self.integratedCurrent
 
   def getCurrentState(self):
-    return self.prevTime, self.chargeSession, self.batVoltage, self.getCurrent(), self.integradetCurrent, self.integratedPower
+    return self.prevTime, self.chargeSession, self.batVoltage, self.getCurrent(), self.integratedCurrent, self.integratedPower
 
   def getRelayState(self):
     return self.vm.relay
