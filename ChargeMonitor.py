@@ -27,6 +27,7 @@ class ChargeTest:
     self.batteryID = options.battery_id
     self.run = True
     self.runThread = None
+    self.cutOffCurrent = options.i_min
 
   def sendData(self, chargeSession, voltage, current, integratedCurrent, intPower, t):
     session = requests.session()
@@ -77,7 +78,7 @@ class ChargeTest:
       print(self.chargeMon.rawValues)
       t, chargeSession, U_bat, I_bat, int_current, int_power = self.chargeMon.getCurrentState()
       self.sendData(chargeSession, U_bat, I_bat, int_current, int_power, t)
-      if (self.options.i_min / 1000) > I_bat:
+      if (self.cutOffCurrent / 1000) > I_bat:
         doneCount += 1
         if doneCount >= 5:
           self.chargeMon.stopCharge()
